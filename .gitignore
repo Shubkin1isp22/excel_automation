@@ -6,3 +6,4 @@ txt_fyles
 test.py
 __pycache__
 jsons
+.DS_Store
