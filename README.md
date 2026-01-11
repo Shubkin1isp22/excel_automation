@@ -2,12 +2,15 @@
 
 ## Для запуска:
 #### В консоли выполняем следующие команды:
-##### 
-##### Активация в MacOS:
+##### Что бы установить env:
+```
+python -m venv myenv
+```
+##### Активация env в MacOS:
 ```
 source myenv/bin/activate
 ```
-##### Активация в Windows:
+##### Активация env в Windows:
 ```
 .\venv\Scripts\activate
 ```
