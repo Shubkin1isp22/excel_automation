@@ -1,61 +1,124 @@
-import pandas as pd
-import os
-file_name = '/Users/shekspii/Desktop/excel_py/excel_fyles/Маппинг_ЦЕХ_RDV_OVRP_v2.0 (1).xlsx'
+import customtkinter as ctk
+import jsons, sql, assets
+from tkinter import filedialog
 
-column_names = ['Колонка 1', 'Колонка 2', 'Колонка 3', 'Колонка 4', 'Колонка 5', 
-                'Колонка 6', 'Колонка 7', 'Колонка 8', 'Колонка 9', 'Колонка 10', 
-                'Колонка 11', 'Колонка 12', 'Колонка 13', 'Колонка 14', 'Колонка 15', 
-                'Колонка 16', 'Колонка 17', 'Колонка 18', 'Колонка 19', 'Колонка 20', 
-                'Колонка 21', 'Колонка 22', 'Колонка 23', 'Колонка 24', 'Колонка 25', 
-                'Колонка 26', 'Колонка 27', 'Колонка 28', 'Колонка 29', 'Колонка 30', 
-                'Колонка 31', 'Колонка 32', 'Колонка 33', 'Колонка 34']
-column_names_2 = ['Колонка 1', 'Колонка 2', 'Колонка 3', 'Колонка 4', 'Колонка 5', 
-                'Колонка 6', 'Колонка 7', 'Колонка 8', 'Колонка 9', 'Колонка 10', 
-                'Колонка 11', 'Колонка 12', 'Колонка 13', 'Колонка 14', 'Колонка 15', 
-                'Колонка 16', 'Колонка 17', 'Колонка 18', 'Колонка 19', 'Колонка 20', 
-                'Колонка 21', 'Колонка 22', 'Колонка 23']
+class Gui(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-dd = pd.read_excel(file_name, sheet_name="Детали загрузок Src-RDV", header=None) #объект листа "Детали загрузок Src-RDV"
-dd.columns = column_names
+        self.geometry("400x390")
+        self.title("from excel")
 
-df = pd.read_excel(file_name, sheet_name="Перечень загрузок Src-RDV", header=None)
-df.columns = column_names_2
+        # Переменные изменяемых строк
+        self.path_var = ctk.StringVar(value="")     # Для инпута с путём к excel файлу
+        self.sql_var = ctk.BooleanVar(value=False)  # Для значения чекбокса sql
+        self.json_var = ctk.BooleanVar(value=False) # Для значения чекбокса json
+        self.yaml_var = ctk.BooleanVar(value=False) # Для значения чекбокса yaml
+        self.error_var = ctk.StringVar(value="")    # Для надписи с ошибками
 
-filtered_data = dd[dd["Колонка 2"].isnull() | (dd["Колонка 2"].astype(str).str.strip() == "")].sort_values(by="Колонка 11", ascending=True)
-filteres_2list = df[df["Колонка 2"].isnull() | (df["Колонка 2"].astype(str).str.strip() == "")]
+        # bind подписывает функцию update_width на событие Configure(Изменение окна)
+        self.bind("<Configure>", self.update_width)
+        
+        # Кнопка выбора excel файла
+        self.button_choose_file = ctk.CTkButton(self, text="Выбрать файл", height=40, corner_radius=5, command=self.choose_file)
+        self.button_choose_file.pack(side='top', fill='x', pady=20, padx=20)
+
+        # Поле вывода пути к файлу excel
+        self.excel_file_path_entry = ctk.CTkEntry(self, placeholder_text="Путь к excel файлу", textvariable=self.path_var, height=40, corner_radius=5)
+        self.excel_file_path_entry.pack(side='top', fill='x', padx=20)
+
+        # Строка для вывода ошибок
+        self.errors_label = ctk.CTkLabel(self, text_color="red", justify='left', textvariable=self.error_var)
+        self.errors_label.pack(pady=5, padx=20, side='top', fill='x')
+
+        # Кнопка создать файлы (sql, json, yaml)
+        self.main_button = ctk.CTkButton(self, text = "Создать файлы", height=40, corner_radius=5, command=self.main_command)
+        self.main_button.pack(side='bottom', fill='x', pady=20, padx=20)
+
+        # Фрейм с чекбоксами - класс CheckBoxFrame
+        self.checkbox_frame = CheckBoxFrame(master=self, sql_var=self.sql_var, json_var=self.json_var, yaml_var=self.yaml_var)
+        self.checkbox_frame.pack(pady=(5, 20),padx=20, ipady=2, ipadx=5, side='top', anchor='w')
+
+    # Изменяет настроийки переноса строки в error_label
+    def update_width(self, event):
+        self.errors_label.configure(wraplength = event.width - 40)
+
+    # Обрабатывает нажатие на кнопку "Создать файлы"
+    def main_command(self):
+        if self.path_var.get() != "":
+            self.filtered_data, self.filteres_2list, error = assets.get_lists(self.path_var.get())
+            try:
+                if not error:
+                    checkboxes = [
+                        self.is_sql(),
+                        self.is_json(),
+                        self.is_yaml()
+                    ]
+                    parsing_files = [
+                        sql.get_sql(self.filtered_data, self.filteres_2list),
+                        jsons.get_jsons(self.filtered_data),
+                        "pass"
+                    ]
+                    for i in range(len(checkboxes)):
+                        if checkboxes[i]:
+                            parsing_files[i]
+                else:
+                    self.error_var.set(error)
+            except AttributeError as e:
+                self.error_var.set(f"Ошибка: {e}")
 
 
-txt_file = "./txt_fyles/filtered_data.txt"
+    # Функция окна выбора файла
+    def choose_file(self):
+        file_path = filedialog.askopenfilename()
+        if file_path != "":
+            self.excel_file_path_entry.delete(0, "end")
+            self.path_var.set(file_path)
 
-
-with open(txt_file, "w", encoding="utf-8") as f:
-    last_table_11 = "keyyy"
-    print("GOOOOOOida:", last_table_11)
-    for index_of_string, string in filtered_data.iterrows():
-        if string['Колонка 11'] != last_table_11:
-            # Дата-фрейм для каждой отдельной таблицы приёмника
-            tgt_table_filter = filtered_data[filtered_data["Колонка 11"] == string['Колонка 11']]
-            attr_data = tgt_table_filter
-
-            # Атрибуты
-            attrs = "\n".join(
-                f"{string['Колонка 13']} {string['Колонка 14']} {string['Колонка 15'] if pd.notna(string['Колонка 15']) else "null"},"
-                for _, string in attr_data.iterrows()
-            )
-            
-            keys = "noup"
-            date_1str = filteres_2list[filteres_2list['Колонка 6'] == str(string['Колонка 11'])]
-            if (string['Колонка 11'] == date_1str['Колонка 6'].iloc[0]) & (string['Колонка 3'] == date_1str['Колонка 3'].iloc[0]) & (str(string['Колонка 4']).strip() == str(date_1str['Колонка 4'].iloc[0]).strip()):
-                keys = f"{date_1str["Колонка 13"].iloc[0]}"
-                # print(str(string['Колонка 4']).strip(), str(date_1str['Колонка 4'].iloc[0]).strip())
-            
-            # Просмотр данных по Таблицам приёмника:
-            # log_tables = "./txt_fyles/log_tables.txt"         
-            # with open(log_tables, "a", encoding="utf-8") as fyle:
-            #     fyle.write(f"{string["Колонка 11"]}\n")
-
-            # Запись в txt
-            f.write(f"Строка {index_of_string + 1}\n")
-            f.write(f"DROP TABLE if exists {string['Колонка 11']} cascade;\n\nCREATE TABLE {string['Колонка 11']} (\n{attrs}\n)\nWITH (\n\tappendonly=true,\n\torientation=column,\n\tcompresstype=zstd,\n\tcompresslevel=1\n)\nDISTRIBUTED BY ({keys});\n\n")
-            last_table_11 = string['Колонка 11']
+    # Функции возвращающие статус чекбоксов
+    def is_sql(self):
+        return self.sql_var.get()
     
+    def is_json(self):
+        return self.json_var.get()
+    
+    def is_yaml(self):
+        return self.yaml_var.get()
+    
+    # Выводят в консоль  bool срабатывание чекбоксов
+    def is_sql_checkbox(self):
+        print(self.is_sql())
+    
+    def is_json_checkbox(self):
+        print(self.is_json())
+    
+    def is_yaml_checkbox(self):
+        print(self.is_yaml())
+
+# Класс с чекбоксами sql | json |yaml
+class CheckBoxFrame(ctk.CTkFrame):
+    def __init__(self, master, sql_var, json_var, yaml_var, **kwargs):
+        super().__init__(master, **kwargs)
+
+        # Изменяемые строки состояния чекбоксов(sql, json, yaml)
+        self.sql_var = sql_var
+        self.json_var = json_var
+        self.yaml_var = yaml_var
+
+        # Чекбокс sql
+        checkbox_sql = ctk.CTkCheckBox(self, text='Sql', font=("Arial", 17), checkbox_width=20, checkbox_height=20, corner_radius=3, border_width=2, variable=self.sql_var, onvalue=True, offvalue=False, command=master.is_sql_checkbox)
+        checkbox_sql.pack(pady=5, padx=(5,20))
+
+        # Чекбокс json
+        checkbox_json = ctk.CTkCheckBox(self, text='Json', font=("Arial", 17), checkbox_width=20, checkbox_height=20, corner_radius=3, border_width=2, variable=self.json_var, onvalue=True, offvalue=False, command=master.is_json_checkbox)
+        checkbox_json.pack(pady=5, padx=(5,20))
+        
+        # Чекбокс yaml
+        checkbox_yaml = ctk.CTkCheckBox(self, text='Yaml', font=("Arial", 17), checkbox_width=20, checkbox_height=20, corner_radius=3, border_width=2, variable=self.yaml_var, onvalue=True, offvalue=False, command=master.is_yaml_checkbox)
+        checkbox_yaml.pack(pady=5, padx=(5,20))
+
+
+
+
+app = Gui()
+app.mainloop()

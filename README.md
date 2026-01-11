@@ -1,31 +1,40 @@
-# Excel маппинг - ddl таблицы, <br> json,<br>  yaml.
+# Excel маппинг - ddl таблицы,  json,  yaml.
 
 ## Для запуска:
 #### В консоли выполняем следующие команды:
-```
-python -m venv myenv
-```
+##### 
+##### Активация в MacOS:
 ```
 source myenv/bin/activate
 ```
+##### Активация в Windows:
 ```
-pip install pandas
-```
-#### Запуск скрипта через:
-```
-python sql.py
+.\venv\Scripts\activate
 ```
 
-## После выполнения скрипта:
-#### В корневой директории должен появиться каталог tables_sql, а в неём все ddl таблицы, сформированные из excel-файла.
+#### Запуск скрипта через:
+```
+python main.py
+```
+
+## После запуска скрипта:
+![Изображение интерфейса программы](image.png)
+## После выбора файла, проставления чекбоксов и создания файлов:
+#### В корневой директории должны появиться каталоги tables_sql и jsons, а в них соответственно все ddl таблицы и json-файлы, сформированные из excel-файла.
 ```
 excel_automation
     |__sql.py
     |
     |__tables_sql
+    |   |
+    |   |__filename.sql
+    |   |
+    |   |__anotherfilename.sql
+    |
+    |__jsons
         |
-        |__filename.sql
+        |__filename.json
         |
-        |__anotherfilename.sql
+        |__anotherfilename.json
 ```
 #### by shekspii
