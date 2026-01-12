@@ -6,13 +6,17 @@
 ```
 python -m venv myenv
 ```
-##### Активация env в MacOS:
+##### Активация env в MacOS/Linux:
 ```
 source myenv/bin/activate
 ```
 ##### Активация env в Windows:
 ```
-.\venv\Scripts\activate
+.\myenv\Scripts\activate
+```
+#### Устанавливаем зависимости:
+```
+pip install -r requirements.txt
 ```
 
 #### Запуск скрипта через:
