@@ -1,9 +1,4 @@
-documents
-excel_fyles
-txt_fyles
-test.py
-__pycache__
+__pycache__/
 .DS_Store
-jsons
-tables_sql
-myenv
+myenv/
+data/

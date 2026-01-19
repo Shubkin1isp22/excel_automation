@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import jsons, sql, assets
+from src import jsons, assets, sql
 from tkinter import filedialog
 
 class Gui(ctk.CTk):
@@ -39,7 +39,7 @@ class Gui(ctk.CTk):
         self.checkbox_frame = CheckBoxFrame(master=self, sql_var=self.sql_var, json_var=self.json_var, yaml_var=self.yaml_var)
         self.checkbox_frame.pack(pady=(5, 20),padx=20, ipady=2, ipadx=5, side='top', anchor='w')
 
-    # Изменяет настроийки переноса строки в error_label
+    # Изменяет настройки переноса строки в error_label
     def update_width(self, event):
         self.errors_label.configure(wraplength = event.width - 40)
 

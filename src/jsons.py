@@ -1,5 +1,5 @@
 import pandas as pd
-import assets
+
 
 def get_jsons(filtered_data):
     last_table_11 = "keyy"
