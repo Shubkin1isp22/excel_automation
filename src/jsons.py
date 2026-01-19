@@ -1,8 +1,10 @@
 import pandas as pd
+import os
 
 
 def get_jsons(filtered_data):
     last_table_11 = "keyy"
+    os.makedirs("jsons", exist_ok=True)
     for _, string in filtered_data.iterrows():
         if string['Колонка 11'] != last_table_11:
             with open(f"./jsons/ceh.{string['Колонка 11']}.json", "w", encoding="utf-8") as f:

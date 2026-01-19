@@ -3,6 +3,7 @@ import os
 
 def get_sql(filtered_data, filteres_2list):
     last_table_11 = "keyy"
+    os.makedirs("tables_sql", exist_ok=True)
     for _, string in filtered_data.iterrows():
         if string['Колонка 11'] != last_table_11:
             with open(f"./tables_sql/{string['Колонка 11']}.sql", "w", encoding="utf-8") as f:
