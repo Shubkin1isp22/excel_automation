@@ -55,13 +55,14 @@ class Gui(ctk.CTk):
                         self.is_yaml()
                     ]
                     parsing_files = [
-                        sql.get_sql(self.filtered_data, self.filteres_2list),
-                        jsons.get_jsons(self.filtered_data),
-                        "pass"
+                        lambda: sql.get_sql(self.filtered_data, self.filteres_2list),
+                        lambda: jsons.get_jsons(self.filtered_data),
+                        lambda: None
                     ]
                     for i in range(len(checkboxes)):
                         if checkboxes[i]:
-                            parsing_files[i]
+                            parsing_files[i]()
+                            
                 else:
                     self.error_var.set(error)
             except AttributeError as e:

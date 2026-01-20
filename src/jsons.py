@@ -3,6 +3,7 @@ import os
 
 
 def get_jsons(filtered_data):
+    print("Jsons are making!")
     last_table_11 = "keyy"
     os.makedirs("jsons", exist_ok=True)
     for _, string in filtered_data.iterrows():

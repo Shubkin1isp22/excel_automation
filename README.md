@@ -29,19 +29,17 @@ python -m src.main
 ## После выбора файла, проставления чекбоксов и создания файлов:
 #### В корневой директории должны появиться каталоги tables_sql и jsons, а в них соответственно все ddl таблицы и json-файлы, сформированные из excel-файла.
 ```
-excel_automation
-    |__sql.py
-    |
-    |__tables_sql
-    |   |
-    |   |__filename.sql
-    |   |
-    |   |__anotherfilename.sql
-    |
-    |__jsons
-        |
-        |__filename.json
-        |
-        |__anotherfilename.json
+.
+├── images
+│   └── image.png
+├── README.md
+├── .gitignore
+├── requirements.txt
+└── src
+    ├── __init__.py
+    ├── assets.py
+    ├── jsons.py
+    ├── main.py
+    └── sql.py
 ```
 #### by shekspii

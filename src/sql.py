@@ -2,6 +2,7 @@ import pandas as pd
 import os
 
 def get_sql(filtered_data, filteres_2list):
+    print("sql are making!")
     last_table_11 = "keyy"
     os.makedirs("tables_sql", exist_ok=True)
     for _, string in filtered_data.iterrows():
