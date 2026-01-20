@@ -2,13 +2,15 @@ import pandas as pd
 import os
 
 
-def get_jsons(filtered_data):
+def get_jsons(filtered_data, results_path):
     print("Jsons are making!")
     last_table_11 = "keyy"
-    os.makedirs("jsons", exist_ok=True)
+    jsons_path = os.path.join(results_path, "jsons")
+    os.makedirs(jsons_path, exist_ok=True)
     for _, string in filtered_data.iterrows():
         if string['Колонка 11'] != last_table_11:
-            with open(f"./jsons/ceh.{string['Колонка 11']}.json", "w", encoding="utf-8") as f:
+            json_file_path = os.path.join(jsons_path, f"ceh.{string['Колонка 11']}.json")
+            with open(json_file_path, "w", encoding="utf-8") as f:
                 
                 # Дата-фрейм для каждой отдельной таблицы приёмника
                 tgt_table_filter = filtered_data[filtered_data["Колонка 11"] == string['Колонка 11']]

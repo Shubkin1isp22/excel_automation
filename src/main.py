@@ -1,20 +1,24 @@
 import customtkinter as ctk
-from src import jsons, assets, sql
 from tkinter import filedialog
+from src.modules import assets, jsons, sql
+import os
 
 class Gui(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.geometry("400x390")
+        self.geometry("400x490")
         self.title("from excel")
 
         # Переменные изменяемых строк
-        self.path_var = ctk.StringVar(value="")     # Для инпута с путём к excel файлу
-        self.sql_var = ctk.BooleanVar(value=False)  # Для значения чекбокса sql
-        self.json_var = ctk.BooleanVar(value=False) # Для значения чекбокса json
-        self.yaml_var = ctk.BooleanVar(value=False) # Для значения чекбокса yaml
-        self.error_var = ctk.StringVar(value="")    # Для надписи с ошибками
+        self.path_var = ctk.StringVar(value="Путь к excel файлу")                   # Для инпута с путём к excel файлу
+        self.results_path_var = ctk.StringVar(value="")  # Для инпута с путём сохранения результатов
+
+        self.sql_var = ctk.BooleanVar(value=False)      # Для значения чекбокса sql
+        self.json_var = ctk.BooleanVar(value=False)     # Для значения чекбокса json
+        self.yaml_var = ctk.BooleanVar(value=False)     # Для значения чекбокса yaml
+        
+        self.error_var = ctk.StringVar(value="")        # Для надписи с ошибками
 
         # bind подписывает функцию update_width на событие Configure(Изменение окна)
         self.bind("<Configure>", self.update_width)
@@ -26,6 +30,14 @@ class Gui(ctk.CTk):
         # Поле вывода пути к файлу excel
         self.excel_file_path_entry = ctk.CTkEntry(self, placeholder_text="Путь к excel файлу", textvariable=self.path_var, height=40, corner_radius=5)
         self.excel_file_path_entry.pack(side='top', fill='x', padx=20)
+
+        # Кнопка выбора директории сохранения файлов
+        self.button_choose_directory = ctk.CTkButton(self, text="Выбрать путь сохранения результатов", height=40, corner_radius=5, command=self.choose_directory)
+        self.button_choose_directory.pack(side="top", fill='x', pady=20, padx=20)
+
+        # Поле ввода пути директории сохранения результатов скрипта
+        self.results_path_entry = ctk.CTkEntry(self, placeholder_text="Путь сохранения результатов", height=40, corner_radius=5, textvariable=self.results_path_var)
+        self.results_path_entry.pack(side='top', fill='x', padx=20)
 
         # Строка для вывода ошибок
         self.errors_label = ctk.CTkLabel(self, text_color="red", justify='left', textvariable=self.error_var)
@@ -55,8 +67,8 @@ class Gui(ctk.CTk):
                         self.is_yaml()
                     ]
                     parsing_files = [
-                        lambda: sql.get_sql(self.filtered_data, self.filteres_2list),
-                        lambda: jsons.get_jsons(self.filtered_data),
+                        lambda: sql.get_sql(self.filtered_data, self.filteres_2list, self.results_path_var.get()),
+                        lambda: jsons.get_jsons(self.filtered_data, self.results_path_var.get()),
                         lambda: None
                     ]
                     for i in range(len(checkboxes)):
@@ -75,6 +87,12 @@ class Gui(ctk.CTk):
         if file_path != "":
             self.excel_file_path_entry.delete(0, "end")
             self.path_var.set(file_path)
+
+    def choose_directory(self):
+        directory_path=filedialog.askdirectory()
+        if directory_path != "":
+            self.results_path_entry.delete(0, "end")
+            self.results_path_var.set(directory_path)
 
     # Функции возвращающие статус чекбоксов
     def is_sql(self):

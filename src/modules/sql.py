@@ -1,13 +1,15 @@
 import pandas as pd
 import os
 
-def get_sql(filtered_data, filteres_2list):
+def get_sql(filtered_data, filteres_2list, results_path):
     print("sql are making!")
     last_table_11 = "keyy"
-    os.makedirs("tables_sql", exist_ok=True)
+    sql_path = os.path.join(results_path, "tables_sql")
+    os.makedirs(sql_path, exist_ok=True)
     for _, string in filtered_data.iterrows():
         if string['Колонка 11'] != last_table_11:
-            with open(f"./tables_sql/{string['Колонка 11']}.sql", "w", encoding="utf-8") as f:
+            sql_file_path = os.path.join(sql_path, f"{string['Колонка 11']}.sql")
+            with open(sql_file_path, "w", encoding="utf-8") as f:
                 
                 # Дата-фрейм для каждой отдельной таблицы приёмника
                 tgt_table_filter = filtered_data[filtered_data["Колонка 11"] == string['Колонка 11']]
